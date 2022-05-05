@@ -9,17 +9,26 @@ import UIKit
 
 class CalculatorViewController: UIViewController {
     
-    @IBOutlet weak var display: UILabel!
-    var istypingdigit : Bool = false
-    
-    @IBAction func performOperation(_ sender: UIButton) {
-        guard let operation = sender.titleLabel?.text else { return }
-        if  operation == "π" {
-            display.text = String(Double.pi)
+    var model : CalculatorModel = CalculatorModel()
+    @IBOutlet private weak var display: UILabel!
+    private var istypingdigit : Bool = false
+    private var displayValue : Double {
+        get {
+            guard let text = display.text else { return 0 }
+            return Double(text) ?? 0
         }
-            istypingdigit = false
+        set {
+            display.text = String("\(newValue)")
+        }
     }
-    @IBAction func touchDigit(_ sender: UIButton) {
+    @IBAction private func performOperation(_ sender: UIButton) {
+        guard let operation = sender.titleLabel?.text else { return }
+        model.setOperand(operand: displayValue)
+        model.performOperation(symbol: operation)
+        displayValue = model.result
+        istypingdigit = false
+    }
+    @IBAction private func touchDigit(_ sender: UIButton) {
         guard let digit = sender.titleLabel?.text,
               let correnttext = display.text else { return }
         if istypingdigit {
